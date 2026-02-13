@@ -33,13 +33,16 @@ ecm-identification/
 │   │   ├── ci.py            # 置信区间分析 ✓
 │   │   ├── bootstrap.py     # Bootstrap 分析 ✓
 │   │   └── sensitivity.py   # 敏感性分析 ✓
-│   ├── pipeline/            # 工作流模块
-│   │   └── run_pipeline.py  # 完整流程脚本
+│   ├── pipeline/            # 完整流程模块
+│   │   ├── __init__.py
+│   │   └── run_pipeline.py  # 端到端流程脚本
 │   ├── agent_app/           # Bohrium Agent 模块
+│   │   ├── __init__.py
 │   │   └── app.py           # Agent 入口
-│   └── workflow/            # Dflow 工作流模块
-│       ├── dflow_ops.py     # Dflow 操作定义
-│       └── submit_workflow.py # 工作流提交
+│   └── workflow/            # 三步骤工作流模块 ✓
+│       ├── __init__.py
+│       ├── ops.py           # 三个操作定义 (DataReadOp, IdentifyOp, UncertaintyOp)
+│       └── run_workflow.py  # 工作流运行脚本
 ├── tests/                   # 测试代码
 │   ├── __init__.py          # 测试模块初始化 ✓
 │   ├── run_tests.py         # 统一测试运行器 ✓
@@ -49,14 +52,25 @@ ecm-identification/
 │   ├── test_fit.py          # fit.py 测试 ✓
 │   ├── test_analysis.py     # 不确定性分析测试 ✓
 │   └── outputs/             # 测试输出结果
-└── outputs/                 # 主要输出结果
-    └── cycle_XXX/           # 特定循环的结果
-        ├── params.json      # 识别的参数
-        ├── fit_metrics.json # 拟合指标
-        ├── fit_curve.png    # 拟合曲线
-        ├── residual.png     # 残差图
-        ├── ci_table.csv     # 置信区间表
-        └── sensitivity.png  # 敏感性分析图
+├── outputs/                 # 主要输出结果
+│   ├── cycle_XXX/           # pipeline 输出（特定循环）
+│   │   ├── params.json
+│   │   ├── fit_metrics.json
+│   │   ├── fit_curve.png
+│   │   ├── residual.png
+│   │   ├── ci_table.csv
+│   │   ├── bootstrap_analysis.png
+│   │   └── sensitivity.png
+│   └── workflow/            # workflow 输出（三步骤）
+│       ├── segment.csv      # Step1 输出
+│       ├── params.json      # Step2 输出
+│       ├── fit_metrics.json # Step2 输出
+│       ├── fit_curve.png    # Step2 输出
+│       ├── ci_table.csv     # Step3 输出
+│       ├── sensitivity.png  # Step3 输出
+│       ├── bootstrap_params.csv        # Step3 输出
+│       └── bootstrap_analysis.png      # Step3 输出
+└── example_workflow.py      # 工作流使用示例
 ```
 
 ## 已完成功能
@@ -692,14 +706,71 @@ export ECM_CONFIG_FILE=config.json
 python src/agent_app/app.py
 ```
 
-### 运行 Dflow 工作流
+### 运行三步骤工作流
+
+工作流包含三个独立的步骤：
+
+**Step 1: DataReadOp** - 数据读取和预处理
+- 输入: B0005.mat 文件路径、循环编号
+- 输出: `segment.csv` (包含 t, I, SOC, V)
+
+**Step 2: IdentifyOp** - 参数辨识
+- 输入: `segment.csv`
+- 输出: `params.json`, `fit_metrics.json`, `fit_curve.png`
+
+**Step 3: UncertaintyOp** - 不确定性分析
+- 输入: `segment.csv`, `params.json`
+- 输出: `ci_table.csv`, `sensitivity.png`, `bootstrap_params.csv`, `bootstrap_analysis.png`
 
 ```bash
-# 本地测试工作流
-python src/workflow/submit_workflow.py --local --cycle 1
+# 运行完整的三步骤工作流
+python src/workflow/run_workflow.py --cycle 1 --bootstrap 50
 
-# 提交到 Bohrium（需要配置 Bohrium SDK）
-python src/workflow/submit_workflow.py --cycle 1
+# 指定输出目录
+python src/workflow/run_workflow.py --cycle 1 --output outputs/my_workflow
+
+# 查看帮助
+python src/workflow/run_workflow.py --help
+```
+
+**使用 Python API**:
+
+```python
+from workflow.ops import DataReadOp, IdentifyOp, UncertaintyOp
+
+# Step 1: 数据读取
+segment_csv = DataReadOp.execute(
+    mat_path="data/raw/B0005.mat",
+    cycle_n=1,
+    output_path="outputs/segment.csv"
+)
+
+# Step 2: 参数辨识
+identify_outputs = IdentifyOp.execute(
+    segment_csv=segment_csv,
+    output_dir="outputs"
+)
+
+# Step 3: 不确定性分析
+uncertainty_outputs = UncertaintyOp.execute(
+    segment_csv=segment_csv,
+    params_json=identify_outputs['params_json'],
+    output_dir="outputs",
+    n_bootstrap=50
+)
+```
+
+**运行示例**:
+
+```bash
+# 示例1: 完整工作流
+python example_workflow.py --example 1
+
+# 示例2: 逐步运行（可在步骤间检查结果）
+python example_workflow.py --example 2
+
+# 示例3: 使用便捷函数
+python example_workflow.py --example 3
 ```
 
 ## 项目完成总结
