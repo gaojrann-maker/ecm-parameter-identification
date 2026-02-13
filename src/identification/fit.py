@@ -8,6 +8,7 @@
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.optimize import least_squares, differential_evolution
 from typing import Tuple, Callable, Dict, Optional
 import warnings
@@ -316,3 +317,80 @@ def fit_ecm_params(
     results = identifier.get_results()
     
     return params, results
+
+
+def plot_fit_results(
+    t: np.ndarray,
+    v_measured: np.ndarray,
+    v_pred: np.ndarray,
+    residuals: np.ndarray,
+    params: ECM2RCParams,
+    metrics: Dict,
+    i: np.ndarray = None
+) -> plt.Figure:
+    """
+    Plot parameter identification results
+    
+    Parameters:
+        t: Time series
+        v_measured: Measured voltage
+        v_pred: Predicted voltage
+        residuals: Residuals
+        params: Identified parameters
+        metrics: Fitting metrics
+        i: Current series (optional)
+    
+    Returns:
+        fig: matplotlib figure object
+    """
+    if i is not None:
+        fig, axes = plt.subplots(3, 1, figsize=(12, 10))
+    else:
+        fig, axes = plt.subplots(2, 1, figsize=(12, 8))
+    
+    # Subplot 1: Voltage comparison
+    ax1 = axes[0]
+    ax1.plot(t, v_measured, 'k-', label='Measured', linewidth=1.5, alpha=0.8)
+    ax1.plot(t, v_pred, 'r--', label='Predicted', linewidth=1.5)
+    ax1.set_xlabel('Time (s)')
+    ax1.set_ylabel('Voltage (V)')
+    ax1.set_title(f'Voltage Fitting (RMSE={metrics["RMSE"]:.6f} V, R2={metrics["R2"]:.6f})')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    
+    # Subplot 2: Residuals
+    ax2 = axes[1]
+    ax2.plot(t, residuals, 'b-', linewidth=1)
+    ax2.axhline(y=0, color='k', linestyle='--', linewidth=0.8)
+    ax2.fill_between(t, residuals, 0, alpha=0.3)
+    ax2.set_xlabel('Time (s)')
+    ax2.set_ylabel('Residual (V)')
+    ax2.set_title(f'Residual Analysis (MAE={metrics["MAE"]:.6f} V, Max={metrics["MaxAbsError"]:.6f} V)')
+    ax2.grid(True, alpha=0.3)
+    
+    # Subplot 3: Current (if provided)
+    if i is not None:
+        ax3 = axes[2]
+        ax3.plot(t, i, 'g-', linewidth=1.5)
+        ax3.set_xlabel('Time (s)')
+        ax3.set_ylabel('Current (A)')
+        ax3.set_title('Current Profile')
+        ax3.grid(True, alpha=0.3)
+    
+    # Add parameter info text box
+    param_text = f"Identified Parameters:\n"
+    param_text += f"R0 = {params.R0:.6f} Ohm\n"
+    param_text += f"R1 = {params.R1:.6f} Ohm\n"
+    param_text += f"C1 = {params.C1:.2f} F\n"
+    param_text += f"R2 = {params.R2:.6f} Ohm\n"
+    param_text += f"C2 = {params.C2:.2f} F\n"
+    param_text += f"tau1 = {params.R1*params.C1:.2f} s\n"
+    param_text += f"tau2 = {params.R2*params.C2:.2f} s"
+    
+    axes[0].text(0.02, 0.98, param_text, transform=axes[0].transAxes,
+                fontsize=9, verticalalignment='top',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5),
+                family='monospace')
+    
+    plt.tight_layout()
+    return fig

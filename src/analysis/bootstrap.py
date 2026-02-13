@@ -7,6 +7,7 @@ Bootstrap 不确定性分析模块
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from typing import Callable, Dict, Tuple
 import warnings
 from tqdm import tqdm
@@ -203,3 +204,70 @@ def compare_ci_methods(ci_jacobian: Dict, ci_bootstrap: Dict):
         width_ratio = boot_width / jac_width if jac_width > 0 else np.nan
         print(f"{'':>6} {'':>12} {'Width Ratio':>10} {width_ratio:>12.2f}")
         print("-" * 80)
+
+
+def plot_bootstrap_results(bootstrap_results: Dict, ci_results: Dict = None) -> plt.Figure:
+    """
+    Plot Bootstrap analysis results
+    
+    Parameters:
+        bootstrap_results: Bootstrap analysis results
+        ci_results: Confidence interval results (optional, for comparison)
+    
+    Returns:
+        fig: matplotlib figure object
+    """
+    param_names = bootstrap_results['param_names']
+    n_params = len(param_names)
+    
+    # Create figure
+    fig = plt.figure(figsize=(16, 10))
+    
+    # Subplots 1-5: Parameter distribution histograms
+    for i in range(n_params):
+        ax = plt.subplot(2, 3, i+1)
+        
+        # Plot histogram
+        ax.hist(bootstrap_results['bootstrap_samples'][:, i], 
+               bins=20, alpha=0.7, edgecolor='black', color='skyblue')
+        
+        # Add mean line
+        mean_val = bootstrap_results['bootstrap_mean'][i]
+        ax.axvline(mean_val, color='r', linestyle='--', linewidth=2, label='Mean')
+        
+        # Add confidence interval lines
+        ci_lower = bootstrap_results['ci_lower'][i]
+        ci_upper = bootstrap_results['ci_upper'][i]
+        ax.axvline(ci_lower, color='g', linestyle='--', linewidth=1.5, label='95% CI')
+        ax.axvline(ci_upper, color='g', linestyle='--', linewidth=1.5)
+        
+        # Set labels
+        ax.set_xlabel(f'{param_names[i]}')
+        ax.set_ylabel('Frequency')
+        ax.set_title(f'{param_names[i]} Distribution (Bootstrap)')
+        ax.legend()
+        ax.grid(True, alpha=0.3, axis='y')
+    
+    # Subplot 6: Correlation matrix
+    ax6 = plt.subplot(2, 3, 6)
+    
+    # Calculate correlation matrix
+    corr_matrix = np.corrcoef(bootstrap_results['bootstrap_samples'].T)
+    
+    im = ax6.imshow(corr_matrix, cmap='RdBu_r', vmin=-1, vmax=1, aspect='auto')
+    ax6.set_xticks(range(n_params))
+    ax6.set_yticks(range(n_params))
+    ax6.set_xticklabels(param_names)
+    ax6.set_yticklabels(param_names)
+    ax6.set_title('Parameter Correlation Matrix (Bootstrap)')
+    
+    # Add value annotations
+    for i in range(n_params):
+        for j in range(n_params):
+            text = ax6.text(j, i, f'{corr_matrix[i, j]:.2f}',
+                          ha="center", va="center", color="black", fontsize=8)
+    
+    plt.colorbar(im, ax=ax6, fraction=0.046)
+    
+    plt.tight_layout()
+    return fig

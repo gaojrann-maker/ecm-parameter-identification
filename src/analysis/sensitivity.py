@@ -7,6 +7,7 @@
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 from typing import Callable, Dict
 import warnings
 
@@ -240,3 +241,69 @@ def sensitivity_summary(sensitivity_results: Dict):
     min_sens = sensitivity_rms[param_names.index(ranking[-1])]
     ratio = max_sens / min_sens if min_sens > 0 else np.inf
     print(f"敏感性比值（最大/最小）: {ratio:.2f}")
+
+
+def plot_sensitivity_results(sensitivity_results: Dict) -> plt.Figure:
+    """
+    Plot sensitivity analysis results
+    
+    Parameters:
+        sensitivity_results: Sensitivity analysis results
+    
+    Returns:
+        fig: matplotlib figure object
+    """
+    param_names = sensitivity_results['param_names']
+    sensitivity_curves = sensitivity_results['sensitivity_curves']
+    sensitivity_rms = sensitivity_results['sensitivity_rms']
+    t = np.arange(len(sensitivity_curves))
+    
+    # Create figure
+    fig = plt.figure(figsize=(14, 8))
+    
+    # Subplot 1: Sensitivity curves
+    ax1 = plt.subplot(2, 2, 1)
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+    for i, name in enumerate(param_names):
+        ax1.plot(t, sensitivity_curves[:, i], label=name, 
+                linewidth=1.5, color=colors[i])
+    ax1.set_xlabel('Time Step')
+    ax1.set_ylabel('Sensitivity (V/param)')
+    ax1.set_title('Parameter Sensitivity Curves')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    
+    # Subplot 2: RMS sensitivity bar chart
+    ax2 = plt.subplot(2, 2, 2)
+    bars = ax2.bar(param_names, sensitivity_rms, color=colors, 
+                   edgecolor='black', linewidth=1.5)
+    ax2.set_ylabel('RMS Sensitivity')
+    ax2.set_title('Parameter Sensitivity Ranking (RMS)')
+    ax2.grid(True, alpha=0.3, axis='y')
+    
+    # Add value labels
+    for bar, val in zip(bars, sensitivity_rms):
+        height = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2., height,
+                f'{val:.2e}', ha='center', va='bottom', fontsize=9)
+    
+    # Subplot 3: Maximum sensitivity bar chart
+    ax3 = plt.subplot(2, 2, 3)
+    sensitivity_max = sensitivity_results['sensitivity_max']
+    bars = ax3.bar(param_names, sensitivity_max, color=colors, 
+                   edgecolor='black', linewidth=1.5, alpha=0.7)
+    ax3.set_ylabel('Max Sensitivity')
+    ax3.set_title('Parameter Maximum Sensitivity')
+    ax3.grid(True, alpha=0.3, axis='y')
+    
+    # Subplot 4: Normalized sensitivity
+    ax4 = plt.subplot(2, 2, 4)
+    sensitivity_normalized = sensitivity_results['sensitivity_normalized']
+    bars = ax4.bar(param_names, sensitivity_normalized, color=colors, 
+                   edgecolor='black', linewidth=1.5, alpha=0.7)
+    ax4.set_ylabel('Normalized Sensitivity')
+    ax4.set_title('Normalized Parameter Sensitivity')
+    ax4.grid(True, alpha=0.3, axis='y')
+    
+    plt.tight_layout()
+    return fig
