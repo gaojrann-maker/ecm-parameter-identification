@@ -10,7 +10,12 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-from src.workflow.ops import DataReadOp, IdentifyOp, UncertaintyOp
+# 兼容两种运行方式
+try:
+    from src.workflow.ops import DataReadOp, IdentifyOp, UncertaintyOp
+except ModuleNotFoundError:
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from src.workflow.ops import DataReadOp, IdentifyOp, UncertaintyOp
 
 
 def run_workflow(

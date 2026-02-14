@@ -13,13 +13,24 @@ import sys
 from pathlib import Path
 from typing import Dict, Any
 
-from src.ecm.loader import load_discharge_cc_segment
-from src.ecm.ocv import fit_ocv_curve
-from src.ecm.ecm2rc import ECM2RCParams, simulate_voltage
-from src.identification.fit import fit_ecm_params, plot_fit_results
-from src.analysis.ci import analyze_parameter_uncertainty, compute_jacobian_numerical
-from src.analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
-from src.analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
+# 兼容两种运行方式
+try:
+    from src.ecm.loader import load_discharge_cc_segment
+    from src.ecm.ocv import fit_ocv_curve
+    from src.ecm.ecm2rc import ECM2RCParams, simulate_voltage
+    from src.identification.fit import fit_ecm_params, plot_fit_results
+    from src.analysis.ci import analyze_parameter_uncertainty, compute_jacobian_numerical
+    from src.analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
+    from src.analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
+except ModuleNotFoundError:
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from src.ecm.loader import load_discharge_cc_segment
+    from src.ecm.ocv import fit_ocv_curve
+    from src.ecm.ecm2rc import ECM2RCParams, simulate_voltage
+    from src.identification.fit import fit_ecm_params, plot_fit_results
+    from src.analysis.ci import analyze_parameter_uncertainty, compute_jacobian_numerical
+    from src.analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
+    from src.analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
 
 
 class DataReadOp:

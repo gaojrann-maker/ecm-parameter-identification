@@ -15,3 +15,13 @@ h5py>=3.0.0
 
 # 其他工具
 tqdm>=4.62.0
+
+# dflow 工作流
+pydflow>=1.6.0
+
+# HTTP 服务 (Agent 应用必需)
+requests>=2.26.0
+
+# Web 界面
+gradio>=4.0.0
+

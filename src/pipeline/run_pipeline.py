@@ -11,13 +11,25 @@ from pathlib import Path
 from datetime import datetime
 import argparse
 
-from src.ecm.loader import load_discharge_cc_segment
-from src.ecm.ocv import fit_ocv_curve, calculate_soc
-from src.ecm.ecm2rc import ECM2RCParams
-from src.identification.fit import fit_ecm_params, plot_fit_results
-from src.analysis.ci import analyze_parameter_uncertainty
-from src.analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
-from src.analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
+# 兼容两种运行方式
+try:
+    from src.ecm.loader import load_discharge_cc_segment
+    from src.ecm.ocv import fit_ocv_curve, calculate_soc
+    from src.ecm.ecm2rc import ECM2RCParams, simulate_voltage
+    from src.identification.fit import fit_ecm_params, plot_fit_results
+    from src.analysis.ci import analyze_parameter_uncertainty
+    from src.analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
+    from src.analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
+except ModuleNotFoundError:
+    # 如果作为脚本直接运行，添加项目根目录到路径
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+    from src.ecm.loader import load_discharge_cc_segment
+    from src.ecm.ocv import fit_ocv_curve, calculate_soc
+    from src.ecm.ecm2rc import ECM2RCParams, simulate_voltage
+    from src.identification.fit import fit_ecm_params, plot_fit_results
+    from src.analysis.ci import analyze_parameter_uncertainty
+    from src.analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
+    from src.analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
 
 
 def create_output_directory(cycle_number: int, base_dir: str = "outputs") -> Path:
@@ -256,9 +268,7 @@ def run_pipeline(
         print("[步骤 4/6] 置信区间分析...")
         print("-"*70)
     
-    # 创建残差函数
-    from ecm.ecm2rc import simulate_voltage
-    
+    # 创建残差函数（simulate_voltage 已经在文件顶部导入）
     def residual_func(theta):
         params_test = ECM2RCParams.from_array(theta)
         v_pred_test = simulate_voltage(t, i, soc, params_test, ocv_func)
