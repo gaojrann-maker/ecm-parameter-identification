@@ -13,16 +13,13 @@ import sys
 from pathlib import Path
 from typing import Dict, Any
 
-# 添加 src 目录到路径
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from ecm.loader import load_discharge_cc_segment
-from ecm.ocv import fit_ocv_curve
-from ecm.ecm2rc import ECM2RCParams, simulate_voltage
-from identification.fit import fit_ecm_params, plot_fit_results
-from analysis.ci import analyze_parameter_uncertainty, compute_jacobian_numerical
-from analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
-from analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
+from src.ecm.loader import load_discharge_cc_segment
+from src.ecm.ocv import fit_ocv_curve
+from src.ecm.ecm2rc import ECM2RCParams, simulate_voltage
+from src.identification.fit import fit_ecm_params, plot_fit_results
+from src.analysis.ci import analyze_parameter_uncertainty, compute_jacobian_numerical
+from src.analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
+from src.analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
 
 
 class DataReadOp:

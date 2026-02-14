@@ -674,11 +674,14 @@ python tests/run_tests.py analysis
 ### 运行完整流程
 
 ```bash
-# 使用默认参数（第1次放电循环，50次Bootstrap）
+# 在 Bohrium 平台运行（使用默认挂载路径）
 python src/pipeline/run_pipeline.py
 
+# 本地测试（指定本地数据路径）
+python src/pipeline/run_pipeline.py --data data/raw/B0005.mat --cycle 1 --bootstrap 30
+
 # 指定参数
-python src/pipeline/run_pipeline.py --cycle 1 --bootstrap 30 --output outputs
+python src/pipeline/run_pipeline.py --data /data/B0005.mat --cycle 1 --bootstrap 30 --output outputs
 
 # 查看帮助
 python src/pipeline/run_pipeline.py --help
@@ -696,22 +699,35 @@ python src/pipeline/run_pipeline.py --help
 ### 运行 Bohrium Agent
 
 ```bash
-# 使用环境变量配置
-export ECM_DATA_PATH=data/raw/B0005.mat
-export ECM_CYCLE_NUMBER=1
+# 在 Bohrium 平台运行（数据文件自动从挂载点读取）
 python src/agent_app/app.py
 
-# 或使用配置文件
+# 或设置环境变量
+export ECM_DATA_PATH=/data/B0005.mat
+export ECM_CYCLE_NUMBER=1
+export ECM_N_BOOTSTRAP=50
+python src/agent_app/app.py
+
+# 本地测试（指定本地路径）
+export ECM_DATA_PATH=data/raw/B0005.mat
+python src/agent_app/app.py
+
+# 使用配置文件
 export ECM_CONFIG_FILE=config.json
 python src/agent_app/app.py
 ```
+
+**重要说明**:
+- Agent 默认数据路径为 `/data/B0005.mat`（Bohrium 平台挂载点）
+- 在 schema 生成阶段（数据文件不存在），Agent 会自动跳过运行
+- 实际运行时，请通过环境变量 `ECM_DATA_PATH` 指定数据文件位置
 
 ### 运行三步骤工作流
 
 工作流包含三个独立的步骤：
 
 **Step 1: DataReadOp** - 数据读取和预处理
-- 输入: B0005.mat 文件路径、循环编号
+- 输入: B0005.mat 文件路径（平台默认: `/data/B0005.mat`）、循环编号
 - 输出: `segment.csv` (包含 t, I, SOC, V)
 
 **Step 2: IdentifyOp** - 参数辨识
@@ -723,8 +739,11 @@ python src/agent_app/app.py
 - 输出: `ci_table.csv`, `sensitivity.png`, `bootstrap_params.csv`, `bootstrap_analysis.png`
 
 ```bash
-# 运行完整的三步骤工作流
+# 在 Bohrium 平台运行（使用默认挂载路径）
 python src/workflow/run_workflow.py --cycle 1 --bootstrap 50
+
+# 本地测试（指定本地数据路径）
+python src/workflow/run_workflow.py --data data/raw/B0005.mat --cycle 1 --bootstrap 50
 
 # 指定输出目录
 python src/workflow/run_workflow.py --cycle 1 --output outputs/my_workflow
@@ -740,7 +759,7 @@ from workflow.ops import DataReadOp, IdentifyOp, UncertaintyOp
 
 # Step 1: 数据读取
 segment_csv = DataReadOp.execute(
-    mat_path="data/raw/B0005.mat",
+    mat_path="/data/B0005.mat",  # Bohrium 平台挂载路径
     cycle_n=1,
     output_path="outputs/segment.csv"
 )

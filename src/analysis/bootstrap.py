@@ -14,9 +14,8 @@ from tqdm import tqdm
 
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ecm.ecm2rc import ECM2RCParams
+from src.ecm.ecm2rc import ECM2RCParams
 
 
 def residual_bootstrap(

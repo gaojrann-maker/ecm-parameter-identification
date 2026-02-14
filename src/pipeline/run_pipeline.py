@@ -11,16 +11,13 @@ from pathlib import Path
 from datetime import datetime
 import argparse
 
-# 添加 src 目录到路径
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from ecm.loader import load_discharge_cc_segment
-from ecm.ocv import fit_ocv_curve, calculate_soc
-from ecm.ecm2rc import ECM2RCParams
-from identification.fit import fit_ecm_params, plot_fit_results
-from analysis.ci import analyze_parameter_uncertainty
-from analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
-from analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
+from src.ecm.loader import load_discharge_cc_segment
+from src.ecm.ocv import fit_ocv_curve, calculate_soc
+from src.ecm.ecm2rc import ECM2RCParams
+from src.identification.fit import fit_ecm_params, plot_fit_results
+from src.analysis.ci import analyze_parameter_uncertainty
+from src.analysis.bootstrap import residual_bootstrap, plot_bootstrap_results
+from src.analysis.sensitivity import local_sensitivity_analysis, plot_sensitivity_results
 
 
 def create_output_directory(cycle_number: int, base_dir: str = "outputs") -> Path:
@@ -368,7 +365,7 @@ def main():
     parser.add_argument(
         '--data', '-d',
         type=str,
-        default='data/raw/B0005.mat',
+        default='/data/B0005.mat',
         help='B0005.mat 文件路径'
     )
     

@@ -10,14 +10,11 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
-# 添加 src 目录到路径
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from workflow.ops import DataReadOp, IdentifyOp, UncertaintyOp
+from src.workflow.ops import DataReadOp, IdentifyOp, UncertaintyOp
 
 
 def run_workflow(
-    mat_path: str = "data/raw/B0005.mat",
+    mat_path: str = "/data/B0005.mat",
     cycle_n: int = 1,
     output_dir: str = "outputs/workflow",
     current_threshold: float = 0.05,
@@ -120,8 +117,8 @@ def main():
     parser.add_argument(
         '--data', '-d',
         type=str,
-        default='data/raw/B0005.mat',
-        help='Path to B0005.mat file (default: data/raw/B0005.mat)'
+        default='/data/B0005.mat',
+        help='Path to B0005.mat file (default: /data/B0005.mat)'
     )
     
     parser.add_argument(

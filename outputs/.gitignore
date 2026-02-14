@@ -1,7 +1,0 @@
-# 忽略所有输出文件
-*.png
-*.json
-*.csv
-
-# 但保留 .gitkeep 文件
-!.gitkeep

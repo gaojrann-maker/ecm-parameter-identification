@@ -15,10 +15,9 @@ import warnings
 
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ecm.ecm2rc import ECM2RCParams, simulate_voltage
-from ecm.metrics import calculate_all_metrics, print_metrics
+from src.ecm.ecm2rc import ECM2RCParams, simulate_voltage
+from src.ecm.metrics import calculate_all_metrics, print_metrics
 
 
 class ECMParameterIdentification:
