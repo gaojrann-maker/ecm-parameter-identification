@@ -192,7 +192,7 @@ V_k[n+1] = a_k · V_k[n] + b_k · I[n]
 
 下载地址：[NASA Battery Dataset](https://www.nasa.gov/content/prognostics-center-of-excellence-data-set-repository)
 
-将 `B0005.mat`（约 15 MB）放入 `data/raw/` 目录即可使用。
+将 `B0005.mat`（约 15 MB）放入 `data/` 目录即可使用。
 
 ---
 
