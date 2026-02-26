@@ -6,7 +6,7 @@
 
 基于 AI 对话的电池等效电路模型（ECM）参数辨识工具，部署于 Bohrium Apps 平台。
 
-![ECM Model](https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Equivalent_circuit_of_a_battery.svg/400px-Equivalent_circuit_of_a_battery.svg.png)
+![ECM Model](https://www.bohrium.com/apps/ecmv1)
 
 ## 📋 目录
 
@@ -421,5 +421,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 📬 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/your-username/ecm-identification-agent/issues)
 - **Email**: your-email@example.com
