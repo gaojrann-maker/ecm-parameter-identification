@@ -1,0 +1,16 @@
+{
+    "agent": {
+        "module": "agent/agent.py",
+        "name": "ECM Parameter Identification Agent",
+        "welcomeMessage": "Hello! I am the ECM Parameter Identification Assistant. I can help you with battery equivalent circuit model parameter identification and uncertainty analysis.\n\nYou can:\n- Ask me to analyze ECM parameters for a discharge cycle\n- Perform uncertainty assessment (confidence intervals, Bootstrap, sensitivity analysis)\n- Run the complete analysis pipeline\n\nWhat would you like to do?"
+    },
+    "ui": {
+        "title": "ECM Parameter Identification Assistant",
+        "description": "Battery 2nd-order RC equivalent circuit model parameter identification and uncertainty analysis"
+    },
+    "server": {
+        "port": 50001,
+        "host": "0.0.0.0",
+        "allowedHosts": ["*"]
+    }
+}

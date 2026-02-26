@@ -24,7 +24,7 @@ wheels/
 venv/
 env/
 ENV/
-.venv
+.venv/
 
 # IDE
 .vscode/
@@ -37,26 +37,39 @@ ENV/
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# Data files (keep structure, ignore large files)
-*.mat
-*.csv
-data/processed/*
-!data/processed/.gitkeep
+# Data files (large files)
+data/*.mat
+!resources/B0005.mat
 
-# Outputs
-outputs/*/
-tests/outputs/*/
-*.png
-*.jpg
-*.pdf
+# Outputs (generated files)
+outputs/
+tests/outputs/
 
 # Logs
 *.log
+dpdispatcher.log
+websocket.log
+
+# Session data
+.agent_sessions/
+
+# Temporary files
+*.tmp
+*.bak
+*.zip
+
+# Upload folder (generated)
+ecm-agent-upload/
+
+# Test folder
+tests/
+
+# Environment file (contains secrets)
+.env
 
 # Bohrium / dflow
 .bohrium/
 dflow_logs/
 
-# Temporary files
-*.tmp
-*.bak
+# Chat messages cache
+.chat_messages.json
